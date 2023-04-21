@@ -1,5 +1,5 @@
 {
-  "name": "murmurations-offers-want-aggregator",
+  "name": "open-projects-hub",
   "version": "0.1.0",
   "license": "GPLv3",
   "private": true,
@@ -20,7 +20,8 @@
     "@vercel/node": "^2.6.2",
     "isbot": "^3.6.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-tagcloud": "^2.3.1"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.15.0",
