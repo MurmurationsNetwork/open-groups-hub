@@ -1,4 +1,4 @@
-# Murmurations Offers Wants Aggregator
+# Open Groups Hub
 
 To run locally, install the dependencies:
 

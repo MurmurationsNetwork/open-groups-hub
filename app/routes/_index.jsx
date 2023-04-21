@@ -3,7 +3,7 @@ import { useState } from 'react'
 import TagsCloud from '../components/TagsCloud'
 
 export const meta = () => {
-  return [{ title: 'Offers Wants Aggregator' }]
+  return [{ title: 'Open Groups Hub' }]
 }
 
 const tagsData = [
