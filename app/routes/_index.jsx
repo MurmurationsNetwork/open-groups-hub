@@ -129,7 +129,7 @@ export default function Index() {
                           {group.name}
                         </div>
                         <a
-                          className="mb-2 text-sm text-blue-700 text-stone-900 md:text-lg"
+                          className="mb-2 text-sm text-blue-700 md:text-lg"
                           href={`https://${group.primary_url}`}
                           target="_blank"
                           rel="noreferrer"
