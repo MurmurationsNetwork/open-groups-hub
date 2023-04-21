@@ -32,12 +32,11 @@ const groupsData = [
     name: 'Murmurations',
     primary_url: 'murmurations.network',
     description:
-      'Murmurations is a distributed data sharing network to connect regenerative economy projects and organizations, making them visible to the world and each other. Making movements visible.',
+      'Murmurations is a distributed data sharing network to connect regenerative economy projects and organizations, making them visible to the world and each other.',
     locality: 'London',
     country_name: 'United Kingdom',
-    image:
-      'https://murmurations.network/wp-content/uploads/2020/06/murmurations-logo-200.png',
-    tags: ['Open Data', 'regenerative', 'Open Source', 'semantic web'],
+    image: 'https://ic3.dev/murmurations-logo.svg',
+    tags: ['Open Data', 'regenerative', 'Open Source'],
     geographic_scope: 'international',
     last_updated: 1681054293
   },
@@ -74,23 +73,23 @@ export default function Index() {
   return (
     <div className="mt-2 flex flex-col items-center justify-center gap-2 md:mt-8 md:gap-8">
       <div className="flex justify-center gap-4 md:gap-8">
-        <div className="w-20 rounded-lg bg-stone-500 p-2 text-center text-lg text-stone-50 shadow-xl md:w-32 md:p-4 md:text-3xl">
+        <div className="w-20 rounded-lg bg-stone-500 p-2 text-center text-lg text-stone-50 shadow-xl dark:bg-stone-600 md:w-32 md:p-4 md:text-3xl">
           Groups
         </div>
-        <div className="w-20 rounded-lg bg-stone-300 p-2 text-center text-lg shadow-xl hover:scale-105 active:scale-90 active:shadow-md md:w-32 md:p-4 md:text-3xl">
+        <div className="w-20 rounded-lg bg-stone-300 p-2 text-center text-lg shadow-xl hover:scale-105 active:scale-90 active:shadow-md dark:bg-stone-400 dark:text-stone-800 md:w-32 md:p-4 md:text-3xl">
           Needs
         </div>
       </div>
-      <div className="m-2 max-w-screen-xl justify-center rounded-md bg-stone-100 p-4 shadow-md md:m-0">
+      <div className="m-2 max-w-screen-xl justify-center rounded-md bg-stone-200 p-4 shadow-md dark:bg-stone-700 md:m-0">
         <div className="flex items-center justify-center gap-4 md:gap-8">
           {viewTags && (
-            <div className="text-center text-base italic md:text-xl">
+            <div className="text-center text-base italic text-stone-900 dark:text-stone-50 md:text-xl">
               Select a tag
             </div>
           )}
           {!viewTags && (
             <button
-              className="w-14 rounded-lg bg-stone-300 px-2 py-1 text-center text-xs hover:scale-105 active:scale-90 md:w-24 md:px-4 md:py-2 md:text-base"
+              className="w-14 rounded-lg bg-stone-300 px-2 py-1 text-center text-xs hover:scale-105 active:scale-90 dark:bg-stone-400 dark:text-stone-950 md:w-24 md:px-4 md:py-2 md:text-base"
               onClick={() => handleTagView()}
             >
               Reset
@@ -106,7 +105,7 @@ export default function Index() {
           />
         )}
         {tagSelected && (
-          <div className="pt-2 text-center text-lg font-bold text-teal-800 md:pt-4 md:text-2xl">
+          <div className="pt-2 text-center text-lg font-bold text-teal-800 dark:text-teal-500 md:pt-4 md:text-2xl">
             {tagSelected}
           </div>
         )}
@@ -117,7 +116,7 @@ export default function Index() {
             if (group.tags.includes(tagSelected)) {
               return (
                 <div key={index} className="py-2 md:py-4">
-                  <div className="flex flex-col justify-between bg-white p-4">
+                  <div className="flex flex-col justify-between bg-white p-4 shadow-lg dark:bg-black">
                     <div className="flex">
                       <img
                         className="h-24 flex-none md:w-36 lg:h-auto"
@@ -125,21 +124,21 @@ export default function Index() {
                         alt={group.name}
                       />
                       <div className="flex flex-col px-4 md:px-8">
-                        <div className="text-xl font-bold text-stone-900 md:text-3xl">
+                        <div className="text-xl font-bold text-stone-900 dark:text-stone-200 md:text-3xl">
                           {group.name}
                         </div>
                         <a
-                          className="mb-2 text-sm text-blue-700 md:text-lg"
+                          className="mb-2 text-sm text-blue-700 dark:text-blue-500 md:text-lg"
                           href={`https://${group.primary_url}`}
                           target="_blank"
                           rel="noreferrer"
                         >
                           {group.primary_url}
                         </a>
-                        <div className="text-xs font-bold text-stone-400 md:text-base">
+                        <div className="text-xs font-bold text-stone-400 dark:text-stone-500 md:text-base">
                           {group.geographic_scope.toLocaleUpperCase()}
                         </div>
-                        <div className="font-italic text-xs md:text-base">
+                        <div className="font-italic text-xs text-stone-600 dark:text-stone-400 md:text-base">
                           {group.locality}
                           {group.locality && group.country_name
                             ? ','
@@ -148,7 +147,7 @@ export default function Index() {
                         </div>
                       </div>
                     </div>
-                    <div className="my-2 text-sm text-gray-700 md:my-4 md:text-base md:text-lg">
+                    <div className="my-2 text-sm text-stone-900 dark:text-stone-200 md:my-4 md:text-base md:text-lg">
                       {group.description}
                     </div>
                     <div className="flex flex-wrap items-center">
@@ -156,14 +155,14 @@ export default function Index() {
                         return (
                           <div
                             key={index}
-                            className="m-1 rounded-3xl bg-teal-800 px-2 py-1 text-xs text-stone-50 md:m-2 md:px-4 md:py-2 md:text-base"
+                            className="m-1 rounded-3xl bg-teal-800 px-2 py-1 text-xs text-stone-50 dark:bg-teal-700 md:m-2 md:px-4 md:py-2 md:text-base"
                           >
                             {tag}
                           </div>
                         )
                       })}
                     </div>
-                    <div className="mt-2 text-right text-xs text-stone-400 md:mt-4 md:text-base">
+                    <div className="mt-2 text-right text-xs text-stone-400 dark:text-stone-500 md:mt-4 md:text-base">
                       Last Updated:{' '}
                       {new Date(group.last_updated * 1000).toLocaleDateString()}
                     </div>
