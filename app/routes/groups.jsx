@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { json, redirect } from '@remix-run/node'
+import { Link, useLoaderData, useSubmit } from '@remix-run/react'
 
 import TagsCloud from '../components/TagsCloud'
 import { fetchGet } from '../utils/fetcher'
 import getSearchParams from '../utils/getSearchParams'
-import { loadSchema } from '../utils/schema'
 
-export const meta = () => {
+export let meta = () => {
   return [{ title: 'Open Groups Hub' }]
 }
 
-const tagsData = [
+let tagsData = [
   { value: 'sustainable', count: 25 },
   { value: 'recycle', count: 18 },
   { value: 'regenerative', count: 38 },
@@ -31,38 +31,11 @@ const tagsData = [
   { value: 'Living systems', count: 11 }
 ]
 
-const groupsData = [
-  {
-    name: 'Murmurations',
-    primary_url: 'murmurations.network',
-    description:
-      'Murmurations is a distributed data sharing network to connect regenerative economy projects and organizations, making them visible to the world and each other.',
-    locality: 'London',
-    country_name: 'United Kingdom',
-    image: 'https://ic3.dev/murmurations-logo.svg',
-    tags: ['Open Data', 'regenerative', 'Open Source'],
-    geographic_scope: 'international',
-    last_updated: 1681054293
-  },
-  {
-    name: 'Open Credit Network',
-    primary_url: 'opencredit.network',
-    description:
-      'Banks have had a monopoly on credit creation for too long. Together we can build a new, democratically governed economy based on trust.',
-    locality: 'London',
-    country_name: 'United Kingdom',
-    image: 'https://trade.opencredit.network/static/img/ocn-logo.svg',
-    tags: ['Mutual Credit', 'regenerative'],
-    geographic_scope: 'national',
-    last_updated: 1611054293
-  }
-]
-
 export async function action({ request }) {
   let formData = await request.formData()
   let { _action, ...values } = Object.fromEntries(formData)
   if (_action === 'search') {
-    let searchParams = getSearchParams(values, false)
+    let searchParams = getSearchParams(values)
     return redirect(`/groups?${searchParams}`)
   }
   return null
@@ -70,44 +43,42 @@ export async function action({ request }) {
 
 export async function loader({ request }) {
   try {
-    const schemas = await loadSchema()
-
-    const url = new URL(request.url)
+    let url = new URL(request.url)
     let params = {}
     for (let param of url.searchParams.entries()) {
       params[param[0]] = param[1]
     }
 
-    if (Object.keys(params).length === 0) {
-      return json({
-        schemas: schemas
-      })
-    }
+    if (!!params.tags === false) return null
 
-    let searchParams = getSearchParams(params, false)
+    let searchParams = getSearchParams(params)
     let response = await fetchGet(
-      `${process.env.PUBLIC_PROFILE_POST_URL}/nodes?${searchParams}`
+      `${process.env.PUBLIC_INDEX_URL}/nodes?${searchParams}&schema=${process.env.PUBLIC_GROUPS_SCHEMA}`
     )
 
-    const nodes = await response.json()
+    let nodes = await response.json()
 
     if (!response.ok) {
       if (response.status === 400) {
         return json({
-          schemas: schemas,
           params: params,
           message: nodes.errors?.[0].detail,
           success: false
         })
       }
 
-      return new Response('Schema list loading error', {
+      return new Response('Node list loading error', {
         status: response.status
       })
     }
 
+    // TODO: fetch profile data from each node inside a Promise.all
+    nodes.data.map(node => {
+      console.log('fetch =>', node.profile_url)
+      return null
+    })
+
     return json({
-      schemas: schemas,
       nodes: nodes,
       params: params
     })
@@ -118,15 +89,26 @@ export async function loader({ request }) {
 }
 
 export default function Index() {
-  let [viewTags, setViewTags] = useState(true)
-  let [tagSelected, setTagSelected] = useState('')
+  let loaderData = useLoaderData()
+  let nodes = loaderData?.nodes?.data
+  let tag = loaderData?.params?.tags
+  let [viewTags, setViewTags] = useState(nodes ? false : true)
+  let [tagSelected, setTagSelected] = useState(tag ? tag : '')
+  let submit = useSubmit()
 
   function handleTagClick(tag) {
+    let formData = new FormData()
+    formData.append('_action', 'search')
+    formData.append('tags', tag.value)
+    submit(formData, { method: 'post' })
     setTagSelected(tag.value)
     setViewTags(false)
   }
 
   function handleTagView() {
+    let formData = new FormData()
+    formData.append('_action', 'search')
+    submit(formData, { method: 'post' })
     setViewTags(!viewTags)
     if (viewTags === false) {
       setTagSelected('')
@@ -139,9 +121,11 @@ export default function Index() {
         <div className="w-20 rounded-lg bg-stone-500 p-2 text-center text-lg text-stone-50 shadow-xl dark:bg-stone-600 md:w-32 md:p-4 md:text-3xl">
           Groups
         </div>
-        <div className="w-20 rounded-lg bg-stone-300 p-2 text-center text-lg shadow-xl hover:scale-105 active:scale-90 active:shadow-md dark:bg-stone-400 dark:text-stone-800 md:w-32 md:p-4 md:text-3xl">
-          Needs
-        </div>
+        <Link to="/needs">
+          <div className="w-20 rounded-lg bg-stone-300 p-2 text-center text-lg shadow-xl hover:scale-105 active:scale-90 active:shadow-md dark:bg-stone-400 dark:text-stone-800 md:w-32 md:p-4 md:text-3xl">
+            Needs
+          </div>
+        </Link>
       </div>
       <div className="m-2 max-w-screen-xl justify-center rounded-md bg-stone-200 p-4 shadow-md dark:bg-stone-700 md:m-0">
         <div className="flex items-center justify-center gap-4 md:gap-8">
@@ -174,47 +158,46 @@ export default function Index() {
         )}
       </div>
       <div className="container mx-auto max-w-3xl px-4">
-        {tagSelected &&
-          groupsData.map((group, index) => {
-            if (group.tags.includes(tagSelected)) {
+        {!viewTags && nodes?.length > 0
+          ? nodes.map((node, index) => {
               return (
                 <div key={index} className="py-2 md:py-4">
                   <div className="flex flex-col justify-between bg-white p-4 shadow-lg dark:bg-black">
                     <div className="flex">
                       <img
                         className="h-24 flex-none md:w-36 lg:h-auto"
-                        src={group.image}
-                        alt={group.name}
+                        src={node?.image}
+                        alt={node?.name}
                       />
                       <div className="flex flex-col px-4 md:px-8">
                         <div className="text-xl font-bold text-stone-900 dark:text-stone-200 md:text-3xl">
-                          {group.name}
+                          {node?.name}
                         </div>
                         <a
                           className="mb-2 text-sm text-blue-700 dark:text-blue-500 md:text-lg"
-                          href={`https://${group.primary_url}`}
+                          href={`https://${node?.primary_url}`}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {group.primary_url}
+                          {node?.primary_url}
                         </a>
                         <div className="text-xs font-bold text-stone-400 dark:text-stone-500 md:text-base">
-                          {group.geographic_scope.toLocaleUpperCase()}
+                          {node?.geographic_scope?.toLocaleUpperCase()}
                         </div>
                         <div className="font-italic text-xs text-stone-600 dark:text-stone-400 md:text-base">
-                          {group.locality}
-                          {group.locality && group.country_name
+                          {node?.locality}
+                          {node?.locality && node?.country_name
                             ? ','
                             : null}{' '}
-                          {group.country_name}
+                          {node?.country_name}
                         </div>
                       </div>
                     </div>
                     <div className="my-2 text-sm text-stone-900 dark:text-stone-200 md:my-4 md:text-base md:text-lg">
-                      {group.description}
+                      {node?.description}
                     </div>
                     <div className="flex flex-wrap items-center">
-                      {group.tags.map((tag, index) => {
+                      {node?.tags.map((tag, index) => {
                         return (
                           <div
                             key={index}
@@ -227,20 +210,19 @@ export default function Index() {
                     </div>
                     <div className="mt-2 text-right text-xs text-stone-400 dark:text-stone-500 md:mt-4 md:text-base">
                       Last Updated:{' '}
-                      {new Date(group.last_updated * 1000).toLocaleDateString()}
+                      {new Date(node?.last_updated * 1000)
+                        .toISOString()
+                        .replace(/T.+/, '')}
                     </div>
                   </div>
                 </div>
               )
-            } else {
-              return null
-              /* return (
-                <div className="flex flex-col items-center justify-center gap-2 md:gap-4">
-                  No results
-                </div>
-              ) */
-            }
-          })}
+            })
+          : !viewTags && (
+              <div className="flex flex-col items-center justify-center gap-2 md:gap-4">
+                No results
+              </div>
+            )}
       </div>
     </div>
   )
