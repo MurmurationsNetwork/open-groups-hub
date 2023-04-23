@@ -236,6 +236,7 @@ export default function Index() {
                         <div
                           key={index}
                           className="m-1 rounded-3xl bg-teal-800 px-2 py-1 text-xs text-stone-50 dark:bg-teal-700 md:m-2 md:px-4 md:py-2 md:text-base"
+                          onClick={() => handleTagClick({ value: tag })}
                         >
                           {tag}
                         </div>
