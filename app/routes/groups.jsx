@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { json, redirect } from '@remix-run/node'
-import { Link, useLoaderData, useSubmit } from '@remix-run/react'
+import { Link, useLoaderData, useNavigation, useSubmit } from '@remix-run/react'
 
 import TagsCloud from '../components/TagsCloud'
 import { fetchGet } from '../utils/fetcher'
@@ -34,10 +34,13 @@ let tagsData = [
 export async function action({ request }) {
   let formData = await request.formData()
   let { _action, ...values } = Object.fromEntries(formData)
+
   if (_action === 'search') {
     let searchParams = getSearchParams(values)
+
     return redirect(`/groups?${searchParams}`)
   }
+
   return null
 }
 
@@ -48,21 +51,21 @@ export async function loader({ request }) {
     for (let param of url.searchParams.entries()) {
       params[param[0]] = param[1]
     }
-
+    // Bail if there is no tag for searching
     if (!!params.tags === false) return null
 
     let searchParams = getSearchParams(params)
+    // Fetch profiles from Index that match the tag
     let response = await fetchGet(
-      `${process.env.PUBLIC_INDEX_URL}/nodes?${searchParams}&schema=${process.env.PUBLIC_GROUPS_SCHEMA}`
+      `${process.env.PUBLIC_INDEX_URL}/nodes?${searchParams}&schema=${process.env.PUBLIC_GROUPS_SCHEMA}&status=posted`
     )
-
-    let nodes = await response.json()
+    let nodesList = await response.json()
 
     if (!response.ok) {
-      if (response.status === 400) {
+      if (response.status === 404) {
         return json({
           params: params,
-          message: nodes.errors?.[0].detail,
+          message: nodesList.errors?.[0].detail,
           success: false
         })
       }
@@ -72,11 +75,34 @@ export async function loader({ request }) {
       })
     }
 
-    // TODO: fetch profile data from each node inside a Promise.all
-    nodes.data.map(node => {
-      console.log('fetch =>', node.profile_url)
-      return null
-    })
+    let nodes = []
+    // Fetch profile data from each node
+    await Promise.all(
+      nodesList.data.map(async node => {
+        try {
+          let promise = await fetchGet(node.profile_url)
+
+          if (promise.status === 404) {
+            console.error(`404 error loading profile: ${node.profile_url}\n`)
+            return json({
+              message: 'Profile not found',
+              success: false
+            })
+          }
+
+          let payload = await promise.json()
+
+          payload.last_updated = node.last_updated
+          nodes.push(payload)
+
+          return null
+        } catch (error) {
+          console.error(`Could not load profile: ${node.profile_url}\n`, error)
+
+          return null
+        }
+      })
+    )
 
     return json({
       nodes: nodes,
@@ -84,13 +110,15 @@ export async function loader({ request }) {
     })
   } catch (error) {
     console.error(error)
+
     return null
   }
 }
 
 export default function Index() {
   let loaderData = useLoaderData()
-  let nodes = loaderData?.nodes?.data
+  let navigation = useNavigation()
+  let nodes = loaderData?.nodes
   let tag = loaderData?.params?.tags
   let [viewTags, setViewTags] = useState(nodes ? false : true)
   let [tagSelected, setTagSelected] = useState(tag ? tag : '')
@@ -220,7 +248,7 @@ export default function Index() {
             })
           : !viewTags && (
               <div className="flex flex-col items-center justify-center gap-2 md:gap-4">
-                No results
+                {navigation.state !== 'idle' ? 'Loading...' : 'No results'}
               </div>
             )}
       </div>
