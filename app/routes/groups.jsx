@@ -173,6 +173,9 @@ export default function Index() {
             >
               Reset
             </button>
+            <div className="mt-2 md:mt-4">
+              {navigation.state !== 'idle' ? 'Loading...' : ''}
+            </div>
           </div>
         )}
         <div className="flex items-center justify-center gap-4 md:gap-8">
@@ -255,11 +258,7 @@ export default function Index() {
           })
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 md:gap-4">
-            {navigation.state !== 'idle'
-              ? 'Loading...'
-              : tagSelected
-              ? 'No results'
-              : ''}
+            {tagSelected ? 'No results' : ''}
           </div>
         )}
       </div>
