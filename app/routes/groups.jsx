@@ -148,8 +148,8 @@ export default function Index() {
   }
 
   return (
-    <div>
-      <div className="m-2 max-w-screen-xl justify-center rounded-md bg-stone-200 p-4 shadow-md dark:bg-stone-700 md:m-0">
+    <div className="my-2 flex flex-col items-center justify-center md:my-4">
+      <div className="m-2 max-w-screen-xl justify-center rounded-md bg-stone-200 px-4 py-2 shadow-md dark:bg-stone-700 md:m-0 md:m-4 md:px-8">
         {/* Show the selected tag if there is one */}
         {tagSelected && (
           <div className="flex flex-col items-center">

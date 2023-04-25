@@ -15,7 +15,6 @@ export let links = () => [{ rel: 'stylesheet', href: styles }]
 
 export default function App() {
   let { pathname } = useLocation()
-  console.log('location', pathname)
 
   return (
     <html lang="en">
@@ -26,7 +25,7 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-stone-50 text-stone-900 dark:bg-stone-900 dark:text-stone-50">
-        <div className="mt-2 flex flex-col items-center justify-center gap-2 md:mt-8 md:gap-8">
+        <div className="mt-4 flex flex-col items-center justify-center gap-2 md:mt-8">
           <div className="flex justify-center gap-4 md:gap-8">
             {pathname === '/groups' ? (
               <div className="w-20 rounded-lg bg-stone-500 p-2 text-center text-lg text-stone-50 shadow-xl dark:bg-stone-600 md:w-32 md:p-4 md:text-3xl">
