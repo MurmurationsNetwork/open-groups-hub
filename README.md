@@ -21,3 +21,10 @@ npm run dev
 ```
 
 Open up [http://localhost:3000](http://localhost:3000) and try it out!
+
+## TODO
+
+- [x] Setup top nav in root route
+- [ ] Setup ErrorBoundary
+- [ ] Set larger pagesizes when fetching from Index
+- [ ] Create Needs page

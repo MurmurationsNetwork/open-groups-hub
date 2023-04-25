@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { json, redirect } from '@remix-run/node'
-import { Link, useLoaderData, useNavigation, useSubmit } from '@remix-run/react'
+import { useLoaderData, useNavigation, useSubmit } from '@remix-run/react'
 
 import TagsCloud from '../components/TagsCloud'
 import { fetchGet } from '../utils/fetcher'
@@ -148,18 +148,7 @@ export default function Index() {
   }
 
   return (
-    <div className="mt-2 flex flex-col items-center justify-center gap-2 md:mt-8 md:gap-8">
-      {/* TODO: Move this navigation to the root route */}
-      <div className="flex justify-center gap-4 md:gap-8">
-        <div className="w-20 rounded-lg bg-stone-500 p-2 text-center text-lg text-stone-50 shadow-xl dark:bg-stone-600 md:w-32 md:p-4 md:text-3xl">
-          Groups
-        </div>
-        <Link to="/needs">
-          <div className="w-20 rounded-lg bg-stone-300 p-2 text-center text-lg shadow-xl hover:scale-105 active:scale-90 active:shadow-md dark:bg-stone-400 dark:text-stone-800 md:w-32 md:p-4 md:text-3xl">
-            Needs
-          </div>
-        </Link>
-      </div>
+    <div>
       <div className="m-2 max-w-screen-xl justify-center rounded-md bg-stone-200 p-4 shadow-md dark:bg-stone-700 md:m-0">
         {/* Show the selected tag if there is one */}
         {tagSelected && (
