@@ -13,7 +13,7 @@ import { fetchGet } from '../utils/fetcher'
 import getSearchParams from '../utils/getSearchParams'
 
 export let meta = () => {
-  return [{ title: 'Open Groups Hub' }]
+  return [{ title: 'Groups' }]
 }
 
 export async function action({ request }) {
@@ -120,7 +120,7 @@ export async function loader({ request }) {
   })
 }
 
-export default function Index() {
+export default function Groups() {
   let loaderData = useLoaderData()
   let navigation = useNavigation()
   let submit = useSubmit()
@@ -231,7 +231,7 @@ export default function Index() {
                       return (
                         <div
                           key={index}
-                          className="m-1 rounded-3xl bg-teal-800 px-2 py-1 text-xs text-stone-50 dark:bg-teal-700 md:m-2 md:px-4 md:py-2 md:text-base"
+                          className="m-1 rounded-3xl bg-teal-800 px-2 py-1 text-xs text-stone-50 hover:scale-90 active:scale-105 dark:bg-teal-700 md:m-2 md:px-4 md:py-2 md:text-base"
                           onClick={() => handleTagClick({ value: tag })}
                         >
                           {tag}

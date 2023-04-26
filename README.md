@@ -27,4 +27,6 @@ Open up [http://localhost:3000](http://localhost:3000) and try it out!
 - [x] Setup top nav in root route
 - [x] Setup ErrorBoundary
 - [x] Set larger pagesizes when fetching from Index (maximum is 500)
-- [ ] Create Needs page
+- [x] Create Needs page
+- [ ] Add link to group's needs, if it has any
+- [ ] Add link from need to its group, if there is one (sometimes a need might be created with no matched group via the primary_url)
