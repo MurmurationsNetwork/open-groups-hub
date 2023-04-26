@@ -65,7 +65,8 @@ export async function loader({ request }) {
     })
 
     return json({
-      tagsData: tagsData
+      tagsData: tagsData,
+      totalNodes: nodesList.data.length
     })
   }
 
@@ -127,6 +128,7 @@ export default function Needs() {
   let nodes = loaderData?.nodes
   let tag = loaderData?.params?.tags
   let tagsData = loaderData?.tagsData
+  let totalNodes = loaderData?.totalNodes
   let [showTags, setShowTags] = useState(nodes ? false : true)
   let [tagSelected, setTagSelected] = useState(tag ? tag : '')
 
@@ -184,6 +186,9 @@ export default function Needs() {
                 tags={tagsData || []}
                 handleTagClick={handleTagClick}
               />
+              <div className="text-center text-base italic text-stone-900 dark:text-stone-50 md:text-xl">
+                (number of needs: {totalNodes})
+              </div>
             </div>
           )}
         </div>
