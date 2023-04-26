@@ -6,7 +6,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLocation
+  useLocation,
+  useRouteError
 } from '@remix-run/react'
 
 import styles from './tailwind.css'
@@ -55,6 +56,35 @@ export default function App() {
           <Scripts />
           <LiveReload />
         </div>
+      </body>
+    </html>
+  )
+}
+
+export function ErrorBoundary() {
+  let error = useRouteError()
+  console.error('root ErrorBoundary', error)
+
+  return (
+    <html>
+      <head>
+        <title>Tools - Fatal Error</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <Meta />
+        <Links />
+      </head>
+      <body className="bg-stone-50 text-stone-900 dark:bg-stone-900 dark:text-stone-50">
+        <div className="container mx-auto flex h-screen flex-col items-center justify-center px-4">
+          <span className="text-5xl md:text-8xl">😱</span>
+          <h1 className="text-md mt-8 font-bold md:mt-16 md:text-3xl">
+            A fatal error has occurred and was logged
+          </h1>
+          <code className="mt-4 text-sm md:mt-8 md:text-lg">
+            {error instanceof Error ? error.message : JSON.stringify(error)}
+          </code>
+        </div>
+        <Scripts />
       </body>
     </html>
   )

@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { json, redirect } from '@remix-run/node'
-import { useLoaderData, useNavigation, useSubmit } from '@remix-run/react'
+import {
+  useLoaderData,
+  useNavigation,
+  useRouteError,
+  useSubmit
+} from '@remix-run/react'
 
+import HandleError from '../components/HandleError'
 import TagsCloud from '../components/TagsCloud'
 import { fetchGet } from '../utils/fetcher'
 import getSearchParams from '../utils/getSearchParams'
@@ -24,96 +30,94 @@ export async function action({ request }) {
 }
 
 export async function loader({ request }) {
-  try {
-    let url = new URL(request.url)
-    let params = {}
-    for (let param of url.searchParams.entries()) {
-      params[param[0]] = param[1]
-    }
-    // If there is no tag for searching, load the tag list
-    if (!!params.tags === false) {
-      let response = await fetchGet(
-        `${process.env.PUBLIC_INDEX_URL}/nodes?schema=${process.env.PUBLIC_GROUPS_SCHEMA}&status=posted`
-      )
-      let nodesList = await response.json()
-
-      if (!response.ok) {
-        return new Response('Node list loading error', {
-          status: response.status
-        })
-      }
-
-      let tagsData = []
-      nodesList.data.map(node => {
-        node.tags.map(tag => {
-          let tagIndex = tagsData.findIndex(item => item.value === tag)
-          if (tagIndex > -1) {
-            tagsData[tagIndex].count++
-          } else {
-            tagsData.push({ value: tag, count: 1 })
-          }
-          return null
-        })
-        return null
-      })
-
-      return json({
-        tagsData: tagsData
-      })
-    }
-
-    // Otherwise fetch nodes from Index that match the tag
-    let searchParams = getSearchParams(params)
+  let url = new URL(request.url)
+  let params = {}
+  for (let param of url.searchParams.entries()) {
+    params[param[0]] = param[1]
+  }
+  // If there is no tag for searching, load the tag list
+  if (!!params.tags === false) {
     let response = await fetchGet(
-      `${process.env.PUBLIC_INDEX_URL}/nodes?${searchParams}&schema=${process.env.PUBLIC_GROUPS_SCHEMA}&status=posted`
+      `${process.env.PUBLIC_INDEX_URL}/nodes?schema=${process.env.PUBLIC_GROUPS_SCHEMA}&status=posted&page_size=500`
     )
-    let nodesList = await response.json()
 
     if (!response.ok) {
-      return new Response('Node list loading error', {
-        status: response.status
+      throw new Response(`Tag list loading error at ${response.url}`, {
+        status: response.status,
+        statusText: response.statusText
       })
     }
 
-    // Fetch profile data from each node
-    let nodes = []
-    await Promise.all(
-      nodesList.data.map(async node => {
-        try {
-          let promise = await fetchGet(node.profile_url)
+    let nodesList = await response.json()
 
-          if (promise.status === 404) {
-            console.error(`404 error loading profile: ${node.profile_url}\n`)
-            return json({
-              message: 'Profile not found',
-              success: false
-            })
-          }
+    let tagsData = []
+    nodesList.data.map(node => {
+      node.tags.map(tag => {
+        let tagIndex = tagsData.findIndex(item => item.value === tag)
+        if (tagIndex > -1) {
+          tagsData[tagIndex].count++
+        } else {
+          tagsData.push({ value: tag, count: 1 })
+        }
+        return null
+      })
+      return null
+    })
 
-          let payload = await promise.json()
+    return json({
+      tagsData: tagsData
+    })
+  }
 
-          // Add last_updated date/time from Index
-          payload.last_updated = node.last_updated
-          nodes.push(payload)
+  // Otherwise fetch nodes from Index that match the tag
+  let searchParams = getSearchParams(params)
+  let response = await fetchGet(
+    `${process.env.PUBLIC_INDEX_URL}/nodes?${searchParams}&schema=${process.env.PUBLIC_GROUPS_SCHEMA}&status=posted&page_size=500`
+  )
 
-          return null
-        } catch (error) {
-          console.error(`Could not load profile: ${node.profile_url}\n`, error)
+  if (!response.ok) {
+    throw new Response(`Node list loading error at ${response.url}`, {
+      status: response.status,
+      statusText: response.statusText
+    })
+  }
+
+  let nodesList = await response.json()
+
+  // Fetch profile data from each node
+  let nodes = []
+  await Promise.all(
+    nodesList.data.map(async node => {
+      try {
+        let response = await fetchGet(node.profile_url)
+
+        if (!response.ok) {
+          console.error(
+            `${response.status} error loading profile: ${node.profile_url}`
+          )
 
           return null
         }
-      })
-    )
 
-    return json({
-      nodes: nodes,
-      params: params
+        let payload = await response.json()
+
+        // Add last_updated date/time from Index
+        payload.last_updated = node.last_updated
+        nodes.push(payload)
+
+        return null
+      } catch (error) {
+        console.error(`Could not load profile: ${node.profile_url}\n`, error)
+
+        return null
+      }
     })
-  } catch (error) {
-    console.error(error)
+  )
 
-    return null
-  }
+  return json({
+    nodes: nodes,
+    params: params
+  })
 }
 
 export default function Index() {
@@ -247,10 +251,15 @@ export default function Index() {
           })
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 md:gap-4">
-            {tagSelected ? 'No results' : ''}
+            {tagSelected && navigation.state === 'idle' ? 'No results' : ''}
           </div>
         )}
       </div>
     </div>
   )
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError()
+  return HandleError(error, 'groups')
 }
