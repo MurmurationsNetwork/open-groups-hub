@@ -121,8 +121,10 @@ export async function loader({ request }) {
           payload.needs = needsList.data.length
         }
 
-        // Add last_updated date/time from Index
+        // Add data from Index
         payload.last_updated = node.last_updated
+        payload.profile_url = node.profile_url
+
         nodes.push(payload)
 
         return null
@@ -285,11 +287,26 @@ export default function Groups() {
                       )
                     })}
                   </div>
-                  <div className="mt-2 text-right text-xs text-stone-400 dark:text-stone-500 md:mt-4 md:text-base">
-                    Last Updated:{' '}
-                    {new Date(node?.last_updated * 1000)
-                      .toISOString()
-                      .replace(/T.+/, '')}
+                  <div className="flex justify-between">
+                    <div className="mt-2 text-xs text-stone-400 dark:text-stone-500 md:mt-4 md:text-base">
+                      Source:{' '}
+                      <a
+                        className="mb-2 text-blue-700 dark:text-blue-500"
+                        href={`${node?.profile_url}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {node?.profile_url
+                          .replace(/(^\w+:|^)\/\//, '')
+                          .replace(/\/.+/, '')}
+                      </a>
+                    </div>
+                    <div className="mt-2 text-xs text-stone-400 dark:text-stone-500 md:mt-4 md:text-base">
+                      Last Updated:{' '}
+                      {new Date(node?.last_updated * 1000)
+                        .toISOString()
+                        .replace(/T.+/, '')}
+                    </div>
                   </div>
                 </div>
               </div>
