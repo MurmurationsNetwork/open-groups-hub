@@ -187,7 +187,9 @@ export default function Needs() {
                 handleTagClick={handleTagClick}
               />
               <div className="text-center text-base italic text-stone-900 dark:text-stone-50 md:text-xl">
-                (number of needs: {totalNodes})
+                {navigation.state === 'idle' && totalNodes > 0 && (
+                  <span>(number of needs: {totalNodes})</span>
+                )}
               </div>
             </div>
           )}
@@ -263,7 +265,7 @@ export default function Needs() {
                     <div className="mb-2 text-sm text-stone-900 dark:text-stone-200 md:mb-4 md:text-base">
                       More details:{' '}
                       <a
-                        className="mb-2 text-blue-700 dark:text-blue-500"
+                        className="mb-2 truncate text-blue-700 dark:text-blue-500"
                         href={`${node.details_url}`}
                         target="_blank"
                         rel="noreferrer"
@@ -275,9 +277,9 @@ export default function Needs() {
                   <div className="text-sm text-stone-900 dark:text-stone-200 md:text-base">
                     {node?.contact_details?.contact_form && (
                       <div>
-                        Contact us:{' '}
+                        Contact:{' '}
                         <a
-                          className="text-blue-700 dark:text-blue-500"
+                          className="truncate text-blue-700 dark:text-blue-500"
                           href={`${node.contact_details.contact_form}`}
                           target="_blank"
                           rel="noreferrer"
@@ -288,9 +290,9 @@ export default function Needs() {
                     )}
                     {node?.contact_details?.email && (
                       <div>
-                        Email us:{' '}
+                        Email:{' '}
                         <a
-                          className="text-blue-700 dark:text-blue-500"
+                          className="truncate text-blue-700 dark:text-blue-500"
                           href={`mailto:${node.contact_details.contact_form}`}
                           target="_blank"
                           rel="noreferrer"

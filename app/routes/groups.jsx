@@ -187,7 +187,9 @@ export default function Groups() {
                 handleTagClick={handleTagClick}
               />
               <div className="text-center text-base italic text-stone-900 dark:text-stone-50 md:text-xl">
-                (number of groups: {totalNodes})
+                {navigation.state === 'idle' && totalNodes > 0 && (
+                  <span>(number of groups: {totalNodes})</span>
+                )}
               </div>
             </div>
           )}
