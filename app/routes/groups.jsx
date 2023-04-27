@@ -251,16 +251,12 @@ export default function Groups() {
                           {node?.primary_url}
                         </a>{' '}
                         {node?.needs > 0 && (
-                          <span>
-                            (
-                            <Link
-                              to={`/needs?primary_url=${node?.primary_url}`}
-                              className="text-sm text-blue-700 dark:text-blue-500 md:text-lg"
-                            >
-                              {node?.needs} needs
-                            </Link>
-                            )
-                          </span>
+                          <Link to={`/needs?primary_url=${node?.primary_url}`}>
+                            <button className="mx-2 animate-pulse rounded-sm bg-teal-500 px-2 py-1 text-xs font-bold text-stone-50 hover:scale-90 active:scale-105 dark:bg-teal-800 md:mx-4 md:px-4 md:py-2 md:text-base">
+                              {node?.needs}{' '}
+                              {node?.needs === 1 ? 'need' : 'needs'}
+                            </button>
+                          </Link>
                         )}
                       </span>
                       <div className="text-xs font-bold text-stone-400 dark:text-stone-500 md:text-base">
