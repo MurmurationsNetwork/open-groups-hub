@@ -178,56 +178,65 @@ export default function Groups() {
         {/* Show the selected tag if there is one */}
         {tagSelected && (
           <div className="flex flex-col items-center">
-            <div className="pb-2 text-center text-lg font-bold text-teal-800 dark:text-teal-500 md:pb-4 md:text-2xl">
-              {tagSelected}
-            </div>
-            <button
-              className="w-14 rounded-lg bg-stone-300 px-2 py-1 text-center text-xs hover:scale-105 active:scale-90 dark:bg-stone-400 dark:text-stone-950 md:w-24 md:px-4 md:py-2 md:text-base"
-              onClick={() => handleTagView()}
-            >
-              Reset
-            </button>
-            <div className="mt-2 md:mt-4">
-              {navigation.state !== 'idle' ? 'Loading...' : ''}
-            </div>
+            {navigation.state === 'idle' ? (
+              <>
+                <div className="pb-2 text-center text-lg font-bold text-teal-800 dark:text-teal-500 md:pb-4 md:text-2xl">
+                  {tagSelected}
+                </div>
+                <button
+                  className="mb-2 w-14 rounded-lg bg-stone-300 px-2 py-1 text-center text-xs hover:scale-105 active:scale-90 dark:bg-stone-400 dark:text-stone-950 md:mb-4 md:w-24 md:px-4 md:py-2 md:text-base"
+                  onClick={() => handleTagView()}
+                >
+                  Reset
+                </button>
+              </>
+            ) : (
+              <div>Loading...</div>
+            )}
           </div>
         )}
-        <div className="flex items-center justify-center gap-4 md:gap-8">
-          {/* Show the tag cloud if there is no tag selected */}
-          {!tagSelected && (
+        {/* Show the tag cloud if there is no tag selected */}
+        {!tagSelected && (
+          <div className="flex items-center justify-center gap-4 md:gap-8">
             <div>
               <div className="text-center text-base italic text-stone-900 dark:text-stone-50 md:text-xl">
-                Select a tag
+                {navigation.state === 'idle' ? 'Select a tag' : 'Loading...'}
               </div>
-              <TagsCloud
-                minSize={14}
-                maxSize={48}
-                tags={tagsData || []}
-                handleTagClick={handleTagClick}
-              />
+              {navigation.state === 'idle' && (
+                <TagsCloud
+                  minSize={14}
+                  maxSize={48}
+                  tags={tagsData || []}
+                  handleTagClick={handleTagClick}
+                />
+              )}
               <div className="text-center text-base italic text-stone-900 dark:text-stone-50 md:text-xl">
                 {navigation.state === 'idle' && totalNodes > 0 && (
                   <span>(number of groups: {totalNodes})</span>
                 )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <div className="container mx-auto max-w-3xl px-4">
         {/* Show the list of nodes if there are any */}
-        {nodes?.length > 0 ? (
+        {navigation.state === 'idle' && nodes?.length > 0 ? (
           nodes.map((node, index) => {
             return (
               <div key={index} className="py-2 md:py-4">
-                <div className="flex flex-col justify-between bg-white p-4 shadow-lg dark:bg-black">
-                  <div className="flex">
-                    <img
-                      className="h-24 flex-none md:w-36 lg:h-auto"
-                      src={node?.image}
-                      alt={node?.name}
-                    />
-                    <div className="flex flex-col px-4 md:px-8">
+                <div className="flex flex-col justify-between bg-white p-4 shadow-lg dark:bg-black md:p-8">
+                  <div className="flex flex-wrap">
+                    {node?.image && (
+                      <div className="pr-4 md:pr-8">
+                        <img
+                          className="mb-2 h-24 md:h-36"
+                          src={node?.image}
+                          alt={node?.name}
+                        />
+                      </div>
+                    )}
+                    <div className="flex flex-col">
                       <div className="text-xl font-bold text-stone-900 dark:text-stone-200 md:text-3xl">
                         {node?.name}
                       </div>
@@ -245,7 +254,7 @@ export default function Groups() {
                           <span>
                             (
                             <Link
-                              to={`/needs/?primary_url=${node?.primary_url}`}
+                              to={`/needs?primary_url=${node?.primary_url}`}
                               className="text-sm text-blue-700 dark:text-blue-500 md:text-lg"
                             >
                               {node?.needs} needs
