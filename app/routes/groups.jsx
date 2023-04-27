@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { json, redirect } from '@remix-run/node'
 import {
+  Link,
   useLoaderData,
   useNavigation,
   useRouteError,
@@ -101,6 +102,24 @@ export async function loader({ request }) {
         }
 
         let payload = await response.json()
+
+        let needsResp = await fetchGet(
+          `${process.env.PUBLIC_INDEX_URL}/nodes?schema=${process.env.PUBLIC_GROUPS_NEEDS_SCHEMA}&primary_url=${node.primary_url}&status=posted&page_size=500`
+        )
+
+        if (!needsResp.ok) {
+          throw new Response(`Needs list loading error at ${response.url}`, {
+            status: response.status,
+            statusText: response.statusText
+          })
+        }
+
+        let needsList = await needsResp.json()
+
+        // Add needs total for node to payload, if any
+        if (needsList.data.length > 0) {
+          payload.needs = needsList.data.length
+        }
 
         // Add last_updated date/time from Index
         payload.last_updated = node.last_updated
@@ -212,14 +231,29 @@ export default function Groups() {
                       <div className="text-xl font-bold text-stone-900 dark:text-stone-200 md:text-3xl">
                         {node?.name}
                       </div>
-                      <a
-                        className="mb-2 text-sm text-blue-700 dark:text-blue-500 md:text-lg"
-                        href={`https://${node?.primary_url}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {node?.primary_url}
-                      </a>
+                      <span>
+                        {' '}
+                        <a
+                          className="mb-2 text-sm font-bold text-blue-700 dark:text-blue-500 md:text-lg"
+                          href={`https://${node?.primary_url}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {node?.primary_url}
+                        </a>{' '}
+                        {node?.needs > 0 && (
+                          <span>
+                            (
+                            <Link
+                              to={`/needs/?primary_url=${node?.primary_url}`}
+                              className="text-sm text-blue-700 dark:text-blue-500 md:text-lg"
+                            >
+                              {node?.needs} needs
+                            </Link>
+                            )
+                          </span>
+                        )}
+                      </span>
                       <div className="text-xs font-bold text-stone-400 dark:text-stone-500 md:text-base">
                         {node?.geographic_scope?.toLocaleUpperCase()}
                       </div>

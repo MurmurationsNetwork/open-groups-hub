@@ -35,8 +35,8 @@ export async function loader({ request }) {
   for (let param of url.searchParams.entries()) {
     params[param[0]] = param[1]
   }
-  // If there is no tag for searching, load the tag list
-  if (!!params.tags === false) {
+  // If there is no tag for searching and no primary_url, load the tag list
+  if (!!params.tags === false && !!params.primary_url === false) {
     let response = await fetchGet(
       `${process.env.PUBLIC_INDEX_URL}/nodes?schema=${process.env.PUBLIC_GROUPS_NEEDS_SCHEMA}&status=posted&page_size=500`
     )
@@ -70,7 +70,7 @@ export async function loader({ request }) {
     })
   }
 
-  // Otherwise fetch nodes from Index that match the tag
+  // Otherwise fetch nodes from Index that match the tag and/or primary_url
   let searchParams = getSearchParams(params)
   let response = await fetchGet(
     `${process.env.PUBLIC_INDEX_URL}/nodes?${searchParams}&schema=${process.env.PUBLIC_GROUPS_NEEDS_SCHEMA}&status=posted&page_size=500`
@@ -127,6 +127,7 @@ export default function Needs() {
   let submit = useSubmit()
   let nodes = loaderData?.nodes
   let tag = loaderData?.params?.tags
+  let primaryUrl = loaderData?.params?.primary_url
   let tagsData = loaderData?.tagsData
   let totalNodes = loaderData?.totalNodes
   let [showTags, setShowTags] = useState(nodes ? false : true)
@@ -173,12 +174,14 @@ export default function Needs() {
             </div>
           </div>
         )}
-        <div className="flex items-center justify-center gap-4 md:gap-8">
-          {/* Show the tag cloud if there is no tag selected */}
-          {!tagSelected && (
+        {/* Show the tag cloud if there is no tag selected */}
+        {!tagSelected && (
+          <div className="flex items-center justify-center gap-4 md:gap-8">
             <div>
               <div className="text-center text-base italic text-stone-900 dark:text-stone-50 md:text-xl">
-                Select a tag
+                {primaryUrl && navigation.state === 'idle'
+                  ? `${nodes?.length} needs found`
+                  : 'Select a tag'}
               </div>
               <TagsCloud
                 minSize={14}
@@ -192,8 +195,8 @@ export default function Needs() {
                 )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <div className="container mx-auto max-w-3xl px-4">
         {/* Show the list of nodes if there are any */}
