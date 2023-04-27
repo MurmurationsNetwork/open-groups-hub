@@ -13,7 +13,7 @@ import { fetchGet } from '../utils/fetcher'
 import getSearchParams from '../utils/getSearchParams'
 
 export let meta = () => {
-  return [{ title: 'Groups' }]
+  return [{ title: 'Needs' }]
 }
 
 export async function action({ request }) {
