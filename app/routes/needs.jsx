@@ -262,10 +262,10 @@ export default function Needs() {
                     {node?.description}
                   </div>
                   {node?.details_url && (
-                    <div className="mb-2 text-sm text-stone-900 dark:text-stone-200 md:mb-4 md:text-base">
+                    <div className="mb-2 w-72 text-sm text-stone-900 dark:text-stone-200 md:mb-4 md:w-11/12 md:text-base">
                       More details:{' '}
                       <a
-                        className="mb-2 truncate text-blue-700 dark:text-blue-500"
+                        className="mb-2 block truncate text-blue-700 dark:text-blue-500"
                         href={`${node.details_url}`}
                         target="_blank"
                         rel="noreferrer"
@@ -275,29 +275,28 @@ export default function Needs() {
                     </div>
                   )}
                   <div className="text-sm text-stone-900 dark:text-stone-200 md:text-base">
-                    {node?.contact_details?.contact_form && (
-                      <div>
-                        Contact:{' '}
-                        <a
-                          className="truncate text-blue-700 dark:text-blue-500"
-                          href={`${node.contact_details.contact_form}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {node.contact_details.contact_form}
-                        </a>
-                      </div>
-                    )}
+                    <div>Contact:</div>
                     {node?.contact_details?.email && (
-                      <div>
-                        Email:{' '}
+                      <div className="w-72 md:w-11/12">
                         <a
-                          className="truncate text-blue-700 dark:text-blue-500"
+                          className="block truncate text-blue-700 dark:text-blue-500"
                           href={`mailto:${node.contact_details.contact_form}`}
                           target="_blank"
                           rel="noreferrer"
                         >
                           {node.contact_details.email}
+                        </a>
+                      </div>
+                    )}
+                    {node?.contact_details?.contact_form && (
+                      <div className="w-72 md:w-11/12">
+                        <a
+                          className="block truncate text-blue-700 dark:text-blue-500"
+                          href={`${node.contact_details.contact_form}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {node.contact_details.contact_form}
                         </a>
                       </div>
                     )}
