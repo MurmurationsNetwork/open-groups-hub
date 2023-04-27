@@ -314,13 +314,13 @@ export default function Needs() {
                   <div className="my-4 flex flex-wrap items-center md:my-8">
                     {node?.tags.map((tag, index) => {
                       return (
-                        <div
+                        <button
                           key={index}
                           className="m-1 rounded-3xl bg-teal-800 px-2 py-1 text-xs text-stone-50 hover:scale-90 active:scale-105 dark:bg-teal-700 md:m-2 md:px-4 md:py-2 md:text-base"
                           onClick={() => handleTagClick({ value: tag })}
                         >
                           {tag}
-                        </div>
+                        </button>
                       )
                     })}
                   </div>
