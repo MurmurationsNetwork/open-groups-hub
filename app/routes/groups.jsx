@@ -54,7 +54,9 @@ export async function loader({ request }) {
     let tagsData = []
     nodesList.data.map(node => {
       node.tags.map(tag => {
-        let tagIndex = tagsData.findIndex(item => item.value === tag)
+        let tagIndex = tagsData.findIndex(
+          item => item.value.toLocaleUpperCase() === tag.toLocaleUpperCase()
+        )
         if (tagIndex > -1) {
           tagsData[tagIndex].count++
         } else {

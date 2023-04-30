@@ -53,7 +53,9 @@ export async function loader({ request }) {
     let tagsData = []
     nodesList.data.map(node => {
       node.tags.map(tag => {
-        let tagIndex = tagsData.findIndex(item => item.value === tag)
+        let tagIndex = tagsData.findIndex(
+          item => item.value.toLocaleUpperCase() === tag.toLocaleUpperCase()
+        )
         if (tagIndex > -1) {
           tagsData[tagIndex].count++
         } else {
@@ -105,6 +107,8 @@ export async function loader({ request }) {
         // Add data from Index
         payload.last_updated = node.last_updated
         payload.profile_url = node.profile_url
+        // Use Index primary_url since http/https is removed
+        payload.primary_url = node.primary_url
 
         nodes.push(payload)
 
